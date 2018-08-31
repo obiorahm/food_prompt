@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
@@ -41,21 +42,22 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         AssetManager assetManager = getAssets();
         try{
-            final String[] allAssets = assetManager.list("");
+            final String[] allAssets = assetManager.list("meals");
 
             Glide.with(getApplicationContext())
-                    .load(Uri.parse("file:///android_asset/" + allAssets[assetcount]))
+                    .load(Uri.parse("file:///android_asset/meals/" + allAssets[assetcount]))
                     .into(imageView);
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    assetcount++;
+                    int tempCount = assetcount + 1;
                     Log.d(LOG_TAG, "assetcount " + assetcount);
-                    if (assetcount >= 0 && assetcount < allAssets.length){
+                    if (tempCount >= 0 && tempCount < allAssets.length){
+                        assetcount = tempCount;
                         if (!allAssets[0].equals("")){
                             Glide.with(getApplicationContext())
-                                    .load(Uri.parse("file:///android_asset/" + allAssets[assetcount]))
+                                    .load(Uri.parse("file:///android_asset/meals/" + allAssets[assetcount]))
                                     .into(imageView);
                         }
                     }
@@ -65,12 +67,13 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             prevImageBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    assetcount--;
+                    int tempCount = assetcount - 1;
                     Log.d(LOG_TAG, "assetcount " + assetcount);
-                    if (assetcount >= 0 && assetcount < allAssets.length){
+                    if (tempCount >= 0 && tempCount < allAssets.length){
+                        assetcount = tempCount;
                         if (!allAssets[0].equals("")){
                             Glide.with(getApplicationContext())
-                                    .load(Uri.parse("file:///android_asset/" + allAssets[assetcount]))
+                                    .load(Uri.parse("file:///android_asset/meals/" + allAssets[assetcount]))
                                     .into(imageView);
                         }
 
@@ -87,6 +90,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         Intent checkTTSIntent = new Intent();
         checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
         startActivityForResult(checkTTSIntent, MY_DATA_CHECK_CODE);
+
+        final TextView textViewQuestion = findViewById(R.id.selected_option);
+        textViewQuestion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                myTTS.speak(textViewQuestion.getText().toString(), TextToSpeech.QUEUE_FLUSH, null);
+            }
+        });
 
         questionAdapter = new QuestionAdapter(this, R.layout.list_view_items,myTTS );
 
