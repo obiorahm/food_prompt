@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.mgo983.myapplication.MainActivity"
-    android:background="@drawable/text_border">
+    tools:context="com.example.mgo983.myapplication.MainActivity">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,16 +29,15 @@
     android:layout_height="match_parent"
     android:id="@+id/questions"
     android:layout_toRightOf="@id/image"
-    android:background="@drawable/text_border"
     android:padding="10dp"
-    ></ListView>
+    />
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/baseline_navigate_next_white_48dp"
         android:background="@drawable/circular_button"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_toLeftOf="@id/questions"
         android:layout_margin="20sp"
         android:id="@+id/next_image"
         />

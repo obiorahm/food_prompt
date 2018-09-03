@@ -34,6 +34,7 @@ public class QuestionAdapter extends ArrayAdapter {
     private Context context;
     private TextToSpeech myTTs;
     private ArrayList<String> mData = new ArrayList<String>();
+    private ArrayList<ImageAdapter> mImageAdapters = new ArrayList<>();
     public static TextView currently_selected = null;
 
     static final HashMap<String, String[]> mDataPair = new HashMap<>();
@@ -81,7 +82,26 @@ public class QuestionAdapter extends ArrayAdapter {
     }
 
     public void addItem(String wordInMeal){
+
         mData.add(wordInMeal);
+
+        /* Initialize image adapter here so that states are saved when the views are loaded
+         * Don't initialize in get view else new image adapters are created
+         * */
+
+        ImageAdapter imageAdapter = new ImageAdapter(context, R.layout.list_view_icon_item, myTTs);
+
+        String [] options = mDataPair.get(wordInMeal);
+
+        for(String option : options){
+            String expanded_pair[] = {option, wordInMeal};
+            imageAdapter.addItem(expanded_pair);
+        }
+        mImageAdapters.add(imageAdapter);
+
+
+
+
     }
 
     @Override
@@ -107,15 +127,7 @@ public class QuestionAdapter extends ArrayAdapter {
         }
         final String texttoSpeak =  mData.get(position);
 
-        ImageAdapter imageAdapter = new ImageAdapter(context, R.layout.list_view_icon_item, myTTs);
-
-        String [] options = mDataPair.get(texttoSpeak);
-
-        for(String option : options){
-            String expanded_pair[] = {option, texttoSpeak};
-            imageAdapter.addItem(expanded_pair);
-            Log.d("texttoSpeak", option);
-        }
+        ImageAdapter imageAdapter = mImageAdapters.get(position);
 
         RecyclerView recyclerView =  convertView.findViewById(R.id.option_icons);
 
