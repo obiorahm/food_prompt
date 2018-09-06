@@ -30,6 +30,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     private TextToSpeech myTTs;
     private ArrayList<String[]> mData = new ArrayList<String[]>();
     private ArrayList<Integer> state = new ArrayList<Integer>();
+    private OrderInstructions orderInstructions;
 
 
 
@@ -61,14 +62,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
 
 
-    public ImageAdapter(Context context, int resource, TextToSpeech myTTS){
+    public ImageAdapter(Context context, int resource, TextToSpeech myTTS, OrderInstructions orderInstructions){
         super();
         this.myTTs = myTTS;
         this.context = context;
         this.inflater = LayoutInflater.from(context);
-
-
-
+        this.orderInstructions = orderInstructions;
 
     }
 
@@ -103,6 +102,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         final String textToSpeak = fileName.replace(".png", "");
         holder.mTextView.setText(textToSpeak);
 
+        //set the order option value
+        final String orderKey = fileName.replace(".png","");
+
 
         holder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,6 +118,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
                 Log.d("nextstate" , " " + nextstate + " ");
                 holder.mImageView.setBackground(ContextCompat.getDrawable(context, STATES[nextstate]));
 
+                // collect state in orderInstruction to save in database
+                orderInstructions.putOrder(orderKey, nextstate);
+
                 state.set(position, nextstate);
 
 
@@ -123,6 +128,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         });
         holder.mImageView.setBackground(ContextCompat.getDrawable(context, STATES[state.get(position)]));
+        //holder.mImageView.setForeground(ContextCompat.getDrawable(context, STATES[state.get(position)]));
 
 
 
@@ -141,7 +147,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     public void addItem(String[] icon){
         mData.add(icon);
-        state.add(STATE_NORMAL);
+        //add state from database
+        state.add(orderInstructions.getOrder(icon[0].replace(".png", "")));
+        //state.add(STATE_NORMAL);
         notifyDataSetChanged();
     }
 

@@ -14,8 +14,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener{
@@ -25,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     private int MY_DATA_CHECK_CODE = 0;
     private int assetcount = 0;
     String LOG_TAG = MainActivity.class.getSimpleName();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +47,28 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
         myTTS = new TextToSpeech(this, this);
 
+        final OrderInstructions orderInstructions = new OrderInstructions();
+
+        //get username
+        Intent intent = getIntent();
+        final String username = intent.getStringExtra(LoginActivity.USERNAME);
+
+
 
         AssetManager assetManager = getAssets();
         try{
             final String[] allAssets = assetManager.list("meals");
 
+            String firstMeal = allAssets[assetcount];
+
             Glide.with(getApplicationContext())
-                    .load(Uri.parse("file:///android_asset/meals/" + allAssets[assetcount]))
+                    .load(Uri.parse("file:///android_asset/meals/" + firstMeal))
                     .into(imageView);
+
+            Log.d("chopped salad", firstMeal);
+
+            UserExists(username, orderInstructions, firstMeal);
+
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -55,11 +77,23 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     Log.d(LOG_TAG, "assetcount " + assetcount);
                     if (tempCount >= 0 && tempCount < allAssets.length){
                         assetcount = tempCount;
-                        if (!allAssets[0].equals("")){
+  //                      if (!allAssets[0].equals("")){
                             Glide.with(getApplicationContext())
                                     .load(Uri.parse("file:///android_asset/meals/" + allAssets[assetcount]))
                                     .into(imageView);
-                        }
+                            String meal = trimMealName(allAssets[assetcount - 1]);
+
+                            String next_meal = trimMealName(allAssets[assetcount]);
+
+                            firebaseSaveState(orderInstructions,username, meal);
+                            getSavedFirebaseState(orderInstructions, username, next_meal);
+                            //resetAdapter(orderInstructions);
+//                        }
+                    }
+                    if (tempCount == allAssets.length){
+                        String meal = trimMealName(allAssets[tempCount - 1]);
+
+                        firebaseSaveState(orderInstructions,username, meal);
                     }
                 }
             });
@@ -75,6 +109,10 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                             Glide.with(getApplicationContext())
                                     .load(Uri.parse("file:///android_asset/meals/" + allAssets[assetcount]))
                                     .into(imageView);
+                            String meal = trimMealName(allAssets[assetcount]);
+
+                            getSavedFirebaseState(orderInstructions, username, meal);
+                            //resetAdapter(orderInstructions);
                         }
 
                     }
@@ -99,13 +137,107 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
         });
 
-        questionAdapter = new QuestionAdapter(this, R.layout.list_view_items,myTTS );
+        //resetAdapter(orderInstructions);
+
+
+    }
+
+
+    private String trimMealName(String fileName){
+
+        return fileName.replace(".jpg", "").replace(".jpeg", "")
+                .replace(".png","");
+    }
+
+
+    private void UserExists(final String username, final OrderInstructions orderInstructions, final String firstMeal){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("user");
+
+        databaseReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    if (dataSnapshot.getKey().toString().equals(username)){
+                        getSavedFirebaseState(orderInstructions, username, trimMealName(firstMeal));
+                    }
+                //resetAdapter(orderInstructions);
+
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void resetAdapter(OrderInstructions orderInstructions){
+        questionAdapter = new QuestionAdapter(this, R.layout.list_view_items,myTTS, orderInstructions);
 
         addAdapterItems(questionAdapter);
 
         ListView listView = (ListView) findViewById(R.id.questions);
         listView.setAdapter(questionAdapter);
 
+    }
+
+    private void firebaseSaveState(OrderInstructions orderInstructions, String username, String meal){
+
+        DatabaseReference firebaseDatabase = FirebaseDatabase.getInstance().getReference("user").child(username).child(meal).child("completeOrder");
+        firebaseDatabase.setValue(orderInstructions.toMap());
+
+    }
+
+    private void getSavedFirebaseState(final OrderInstructions orderInstructions, String username, String meal){
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("user")
+                .child(username).child(meal);
+
+        databaseReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Log.d("datasnapshot", dataSnapshot.getValue().toString());
+                //OrderInstructions orderInstructions1 = dataSnapshot.getChildren()getValue(OrderInstructions.class);
+                orderInstructions.clone(dataSnapshot.getValue(OrderInstructions.class));
+                resetAdapter(orderInstructions);
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void addAdapterItems(QuestionAdapter questionAdapter){
@@ -153,5 +285,11 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             myTTS.shutdown();
         }
         super.onDestroy();
+    }
+
+    public void saveMeal(OrderInstructions orderInstructions, String meal, String user_name){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("user")
+                .child(user_name).child(meal);
+                databaseReference.setValue(orderInstructions);
     }
 }

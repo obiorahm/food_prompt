@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "142481854104",
+    "firebase_url": "https://aphasiadatacollection.firebaseio.com",
+    "project_id": "aphasiadatacollection",
+    "storage_bucket": "aphasiadatacollection.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:142481854104:android:d3ece5ba4505a66d",
+        "android_client_info": {
+          "package_name": "com.example.mgo983.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "142481854104-im5ca6vn0jtteip95jbct12b8u4oqku4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mgo983.myapplication",
+            "certificate_hash": "f9c518ef108b1295698efd80892110dd0c5b480d"
+          }
+        },
+        {
+          "client_id": "142481854104-3hn9udeitcn5e71o1239h6ofdm4irhmj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPjimf0iQ7cWUD9VJ_3QttmUuOdmFhRCE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "142481854104-3hn9udeitcn5e71o1239h6ofdm4irhmj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

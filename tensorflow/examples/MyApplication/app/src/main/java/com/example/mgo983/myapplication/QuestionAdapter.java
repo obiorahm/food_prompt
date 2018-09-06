@@ -36,6 +36,7 @@ public class QuestionAdapter extends ArrayAdapter {
     private ArrayList<String> mData = new ArrayList<String>();
     private ArrayList<ImageAdapter> mImageAdapters = new ArrayList<>();
     public static TextView currently_selected = null;
+    private OrderInstructions orderInstructions;
 
     static final HashMap<String, String[]> mDataPair = new HashMap<>();
     static {
@@ -45,39 +46,40 @@ public class QuestionAdapter extends ArrayAdapter {
         String [] share = {"share.png"};
         mDataPair.put("Can I split a dish with someone at my table?", share);
 
-        String [] vegetableOrMeat = {"vegetables.png", "whole.png"};
+        String [] vegetableOrMeat = {"vegetables.png", "main_dish.png"};
         mDataPair.put("Could you give me a larger portion of vegetables and a smaller portion of the main dish? ", vegetableOrMeat);
 
         String [] substitute = {"substitution.png"};
         mDataPair.put("What can I substitute?", substitute);
 
-        String [] slime = {"mayonnaise.png", "dressing.png", "cheese-sauce.png", "mustard.png"};
+        String [] slime = {"mayonnaise.png", "dressing.png", "cheese_sauce.png", "mustard.png"};
         mDataPair.put("Could you leave off the (sour cream, cheese sauce, dressing, mayonnaise, etc.)?", slime);
 
         String [] sliced = {"sliced.png", "whole.png"};
         mDataPair.put("Can you make this dish with sliced chicken breast?", sliced);
 
-        String [] vegetarian = {"vegetarianism.png"};
+        String [] vegetarian = {"vegetarian.png"};
         mDataPair.put("Which dishes do you recommend for vegetarians?", vegetarian);
 
-        String [] nutrition = {"nutrition-facts.png"};
+        String [] nutrition = {"nutrition_facts.png"};
         mDataPair.put("Do you have nutrition information on any of your dishes?", nutrition);
 
         String[] water = {"ice.png", "water.png", "warm.png"};
         mDataPair.put("No ice please?", water);
 
-        String[] meat = { "blue-rare.png", "rare.png" , "medium-rare.png", "medium.png","medium-well.png", "well-done.png"};
+        String[] meat = { "blue_rare.png", "rare.png" , "medium_rare.png", "medium.png","medium_well.png", "well_done.png"};
         mDataPair.put("Can I have my meat well done?", meat);
     }
 
 
 
 
-    public QuestionAdapter(Context context, int resource, TextToSpeech myTTS){
+    public QuestionAdapter(Context context, int resource, TextToSpeech myTTS, OrderInstructions orderInstructions){
         super(context,resource);
         this.myTTs = myTTS;
         this.context = context;
         this.inflater = LayoutInflater.from(context);
+        this.orderInstructions = orderInstructions;
 
     }
 
@@ -89,7 +91,7 @@ public class QuestionAdapter extends ArrayAdapter {
          * Don't initialize in get view else new image adapters are created
          * */
 
-        ImageAdapter imageAdapter = new ImageAdapter(context, R.layout.list_view_icon_item, myTTs);
+        ImageAdapter imageAdapter = new ImageAdapter(context, R.layout.list_view_icon_item, myTTs,orderInstructions);
 
         String [] options = mDataPair.get(wordInMeal);
 
@@ -103,6 +105,7 @@ public class QuestionAdapter extends ArrayAdapter {
 
 
     }
+
 
     @Override
     public int getCount(){
