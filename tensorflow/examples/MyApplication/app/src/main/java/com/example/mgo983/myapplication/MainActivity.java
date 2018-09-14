@@ -129,13 +129,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
         startActivityForResult(checkTTSIntent, MY_DATA_CHECK_CODE);
 
-        final TextView textViewQuestion = findViewById(R.id.selected_option);
-        textViewQuestion.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                myTTS.speak(textViewQuestion.getText().toString(), TextToSpeech.QUEUE_FLUSH, null);
-            }
-        });
+
 
         //resetAdapter(orderInstructions);
 
